@@ -1,0 +1,47 @@
+
+
+#board {
+	display: flex;
+	position: absolute;
+	width: 400px;
+	height:500px;
+	border-color: 'black';
+}
+
+body {
+	display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 10%;
+}
+
+img {
+	width: 40%;
+	height: 40%;
+}
+
+table {
+	position: absolute;
+    width: 400px;
+    height: 500px;
+}
+
+th, td {
+    border: 1px solid black;
+    width: 300px;
+    height: 150px;
+    background-color: darkgrey;
+    /* display: flex; */
+    /* align-items: center; */
+    color: lightgrey;
+}
+
+td:hover {
+	cursor: pointer;
+	color: white;
+}
+
+h2 {
+	color: black;
+	z-index: 10;
+}
