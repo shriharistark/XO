@@ -40,36 +40,24 @@ $(document).ready(function(){
 		}
 	}*/
 
-	function gamePlay(player,callback){
+
+	function gamePlay(player,event){
 
 		console.log(player.getcurrentplayer());
-
 		let currentplayer = player.getcurrentplayer();
-		let arr = [];
-		
-		let nextplayer;
-		$("h2").text(currentplayer+"'s turn");
+		alert(event.target.dataset.clicked);
+		if(event.target.innerHTML != player.player1 || event.target.innerHTML != player.player2 || (event.target.dataset.clicked != true)){
+		event.target.innerHTML = currentplayer;
+		event.target.dataset.clicked = true;
+		event.target.removeEventListener("click",function(){
+			return true;
+		});
+		console.log(event.target);
+		let nextplayer = player.flipplayer();
+		$("h2").text(nextplayer+"'s turn");
+	}
 		console.log("current player: "+currentplayer);
 
-		$("table").click(function(event){
-			event.target.innerHTML = currentplayer;
-
-			setTimeout(() =>{
-				let _gameover = gameover();
-
-				if(!_gameover){
-				nextplayer = player.flipplayer();
-				console.log("next player: "+nextplayer);
-				console.log("---");
-				gamePlay(player,gameover);
-			}
-			else{
-				alert("game over!"+ flipPlayer(currentplayer)+" wins");
-				reset();
-				return;
-			}
-		}, 50 );
-		});
 	}
 
 	function gameover(){
@@ -83,29 +71,6 @@ $(document).ready(function(){
 	rowval2 = ($("tr td:eq(3)").html() == $("tr td:eq(4)").html()) && ($("tr td:eq(5)").html() == $("tr td:eq(4)").html());
 	rowval3 = ($("tr td:eq(6)").html() == $("tr td:eq(7)").html()) && ($("tr td:eq(8)").html() == $("tr td:eq(7)").html());
 
-	/*
-	for(let i = 0 ; i < 3 ; ){
-		console.log($("tr td:eq("+i+")").html());
-		i++;
-	}*/
-
-	//console.log("-----")
-	//second row
-
-	/*
-	for(let i = 3 ; i < 6 ; ){
-		console.log($("tr td:eq("+i+")").html());
-		i++;
-	}*/
-
-	//console.log("-----")
-	//third row
-
-		/*
-	for(let i = 6 ; i < 9 ; ){
-		console.log($("tr td:eq("+i+")").html());
-		i++;
-	}*/
 
 	return rowval1||rowval2||rowval3;
 }
@@ -118,20 +83,6 @@ function checkDiagonal(){
 	let diagonalval1 = (($("tr td:eq(0)").html() == $("tr td:eq(4)").html()) && $("tr td:eq(4)").html() == $("tr td:eq(8)").html());
 	let diagonalval2 = (($("tr td:eq(2)").html() == $("tr td:eq(4)").html()) && $("tr td:eq(4)").html() == $("tr td:eq(6)").html());
 	
-	/*
-	for(let i = 0 ; i < 9 ; ){
-		console.log($("tr td:eq("+i+")").html());
-		i+= 4;
-	}
-
-	console.log("-----")
-
-
-	//right diagonal
-	for(let i = 2 ; i < 8 ; ){
-		console.log($("tr td:eq("+i+")").html());
-		i+= 2;
-	}*/
 
 	return diagonalval1||diagonalval2;
 
@@ -146,29 +97,25 @@ function checkColumn(){
 	let columnval2 = (($("tr td:eq(1)").html() == $("tr td:eq(4)").html()) && $("tr td:eq(4)").html() == $("tr td:eq(7)").html());
 	let columnval3 = (($("tr td:eq(2)").html() == $("tr td:eq(5)").html()) && $("tr td:eq(5)").html() == $("tr td:eq(8)").html());
 
-	/*
-	for(let i = 0 ; i < 9 ; ){
-		console.log($("tr td:eq("+i+")").html());
-		i+= 3;
-	}
-
-	console.log("-----")
-
-	//second column
-	for(let i = 1 ; i < 9 ; ){
-		console.log($("tr td:eq("+i+")").html());
-		i+= 3;
-	}
-
-	console.log("-----")
-
-	//third column
-	for(let i = 2 ; i < 9 ; ){
-		console.log($("tr td:eq("+i+")").html());
-		i+= 3;
-	}*/
 
 	return columnval1||columnval2||columnval3;
+}
+
+function tie(i){
+
+	if(i > 8){
+		return true;
+	}
+	let elemvalue = $("tr td:eq("+i+")").html();
+	//todo
+	if(elemvalue != '' && (elemvalue == player.player1 || elemvalue == player.player2)){
+		return true&&tie(i+1);
+	}
+
+	else{
+		return false;
+	}
+
 }
 
 return (checkRow() || checkColumn() || checkDiagonal());
@@ -181,8 +128,54 @@ function reset(){
 		console.log($("tr td:eq("+i+")").html(i+1));
 		i++;
 	}
+
+	gameStart();
 }
 
-setTimeout(gamePlay(player,gameover),50);
+
+function gameStart(){
+
+	let firstPlayer = prompt("Start with X or O ?");
+	player.currentPlayer = firstPlayer;
+	$("h2").text(player.currentPlayer+"'s turn");
+	setTimeout(function(){
+		for(let elem of $("table").children()){
+				$(elem).click(function(event){
+		gamePlay(player,event);
+		if(gameover()){
+			alert("game over"+player.flipplayer()+" wins!");
+			reset();
+			return;
+		}
+
+	});
+		}
+
+		/*
+	$("table").click(function(event){
+		gamePlay(player,event);
+		if(gameover()){
+			alert("game over"+player.flipplayer()+" wins!");
+			reset();
+			return;
+		}
+
+	});*/
+
+	//$("h2").text(firstPlayer+"'s turn");
+
+	/*setInterval(function(){
+		let gamedone = gameover();
+		if(gamedone){
+			alert("game over! "+player.flipplayer()+" wins!");
+			reset();
+			return;
+		}
+	},20);*/
+},50);
+};
+
+gameStart();
+
 });
 
