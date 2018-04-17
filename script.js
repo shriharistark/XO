@@ -26,32 +26,18 @@ $(document).ready(function(){
 		}
 	};
 
-	/*
-	function flipPlayer(currentPlayer){
-		let players = player.players;
-		console.log("flip players: "+players.player1+","+players.player2);
-		if(currentPlayer == players.pla){
-			currentPlayer = players[1];
-			return currentPlayer;
-		}
-		else if(currentPlayer == players[1]){
-			currentPlayer =players[0];
-			return currentPlayer;
-		}
-	}*/
-
 
 	function gamePlay(player,event){
 
 		//console.log(player.getcurrentplayer());
 		let currentplayer = player.getcurrentplayer();
-		console.log(currentplayer+","+event.target.dataset.clicked);
+		//console.log(currentplayer+","+event.target.dataset.clicked);
 		if(event.target.dataset.clicked == "true"){
 			return;
 		}
 		if((event.target.innerHTML != player.player1 || event.target.innerHTML != player.player2) && (event.target.dataset.clicked != true)){
 
-		console.log(event.target.dataset.clicked);
+		//console.log(event.target.dataset.clicked);
 		event.target.innerHTML = currentplayer;
 		event.target.dataset.clicked = true;
 		event.target.removeEventListener("click",function(){
@@ -103,33 +89,61 @@ function checkColumn(){
 	return columnval1||columnval2||columnval3;
 }
 
-function tie(i){
+function tie(){
+	let cells = $("td");
 
-	if(i > 8){
-		return true;
-	}
-	let elemvalue = $("tr td:eq("+i+")").html();
-	//todo
-	if(elemvalue != '' && (elemvalue == player.player1 || elemvalue == player.player2)){
-		return true&&tie(i+1);
+	for(let cell of cells){
+		if(cell.dataset.clicked != "true"){
+			return false;
+		}
 	}
 
-	else{
-		return false;
-	}
-
+	return true;
 }
 
-return (checkRow() || checkColumn() || checkDiagonal());
+let gameoverobj = {
+	result:"",
+	winner:"",
+
+	setWinner : function(){
+		this.winner = player.flipplayer();
+	},
+
+	setresult : function(res){
+		this.result = res;
+	},
+
+	generateResult : function(){
+		if(checkRow() || checkColumn() || checkDiagonal()){
+			this.setresult("gameover");
+			this.setWinner();
+		}
+
+		else if(tie()){
+			this.setresult("gametie");
+			this.setWinner("none");
+		}
+	},
+
+	getstatus : function(){
+		this.generateResult();
+		return {result:this.result, winner:this.winner};
+	}
+};
+
+return gameoverobj.getstatus();
 
 };
 
 function reset(){
 
 	for(let i = 0 ; i < 9 ; ){
-		console.log($("tr td:eq("+i+")").html(i+1));
+		let elem = $("tr td:eq("+i+")");
+		elem.html(i+1);
+		elem.attr("data-clicked",'');
 		i++;
 	}
+
 
 	gameStart();
 }
@@ -138,42 +152,38 @@ function reset(){
 function gameStart(){
 
 	let firstPlayer = prompt("Start with X or O ?");
+	if(firstPlayer == "X" || firstPlayer == "O"){
+
 	player.currentPlayer = firstPlayer;
 	$("h2").text(player.currentPlayer+"'s turn");
 	setTimeout(function(){
 				
 		$("td").click(function(event){
 		gamePlay(player,event);
-		if(gameover()){
-			alert("game over"+player.flipplayer()+" wins!");
+
+		let gamestatus = gameover();
+		console.log(gamestatus);
+		if(gamestatus.result == "gameover"){
+			alert("game over"+gamestatus.winner+" wins!");
+			reset();
+			return;
+		}
+
+		else if(gamestatus.result == "gametie"){
+			alert("game tied!");
 			reset();
 			return;
 		}
 
 	});
 
-		/*
-	$("table").click(function(event){
-		gamePlay(player,event);
-		if(gameover()){
-			alert("game over"+player.flipplayer()+" wins!");
-			reset();
-			return;
-		}
-
-	});*/
-
-	//$("h2").text(firstPlayer+"'s turn");
-
-	/*setInterval(function(){
-		let gamedone = gameover();
-		if(gamedone){
-			alert("game over! "+player.flipplayer()+" wins!");
-			reset();
-			return;
-		}
-	},20);*/
 },50);
+}
+
+else{
+	alert("choose either X or O");
+	reset();
+}
 };
 
 gameStart();
