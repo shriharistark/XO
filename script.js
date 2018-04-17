@@ -43,21 +43,23 @@ $(document).ready(function(){
 
 	function gamePlay(player,event){
 
-		console.log(player.getcurrentplayer());
+		//console.log(player.getcurrentplayer());
 		let currentplayer = player.getcurrentplayer();
-		alert(event.target.dataset.clicked);
-		if(event.target.innerHTML != player.player1 || event.target.innerHTML != player.player2 || (event.target.dataset.clicked != true)){
+		console.log(currentplayer+","+event.target.dataset.clicked);
+		if(event.target.dataset.clicked == "true"){
+			return;
+		}
+		if((event.target.innerHTML != player.player1 || event.target.innerHTML != player.player2) && (event.target.dataset.clicked != true)){
+
+		console.log(event.target.dataset.clicked);
 		event.target.innerHTML = currentplayer;
 		event.target.dataset.clicked = true;
 		event.target.removeEventListener("click",function(){
-			return true;
+			return false;
 		});
-		console.log(event.target);
 		let nextplayer = player.flipplayer();
 		$("h2").text(nextplayer+"'s turn");
-	}
-		console.log("current player: "+currentplayer);
-
+		}
 	}
 
 	function gameover(){
@@ -65,7 +67,7 @@ $(document).ready(function(){
 		function checkRow(){
 
 			let rowval;
-			console.log("checking row");
+			//console.log("checking row");
 	//first row
 	rowval1 = ($("tr td:eq(0)").html() == $("tr td:eq(1)").html()) && ($("tr td:eq(2)").html() == $("tr td:eq(1)").html());
 	rowval2 = ($("tr td:eq(3)").html() == $("tr td:eq(4)").html()) && ($("tr td:eq(5)").html() == $("tr td:eq(4)").html());
@@ -77,7 +79,7 @@ $(document).ready(function(){
 
 function checkDiagonal(){
 
-	console.log("checking diagonal");
+	//console.log("checking diagonal");
 	//left diagonal
 
 	let diagonalval1 = (($("tr td:eq(0)").html() == $("tr td:eq(4)").html()) && $("tr td:eq(4)").html() == $("tr td:eq(8)").html());
@@ -90,7 +92,7 @@ function checkDiagonal(){
 
 function checkColumn(){
 
-	console.log("checking column");
+	//console.log("checking column");
 	//first column
 
 	let columnval1 = (($("tr td:eq(0)").html() == $("tr td:eq(3)").html()) && $("tr td:eq(3)").html() == $("tr td:eq(6)").html());
@@ -139,8 +141,8 @@ function gameStart(){
 	player.currentPlayer = firstPlayer;
 	$("h2").text(player.currentPlayer+"'s turn");
 	setTimeout(function(){
-		for(let elem of $("table").children()){
-				$(elem).click(function(event){
+				
+		$("td").click(function(event){
 		gamePlay(player,event);
 		if(gameover()){
 			alert("game over"+player.flipplayer()+" wins!");
@@ -149,7 +151,6 @@ function gameStart(){
 		}
 
 	});
-		}
 
 		/*
 	$("table").click(function(event){
